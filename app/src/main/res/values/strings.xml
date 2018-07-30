@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Flohmarkt Termine</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="website_url">www.flohmarkt-termine.net</string>
+    <string name="share_app_title">Flohmarkt-Termine teilen</string>
+    <string name="share_message_headline">Hey,\nich suche gerade Flohmarkt-Termine auf meinem Android Smartphone.</string>
+    <string name="share_message">Es gibt nun dafür eine App.\nDu kannst sie hier downloaden:</string>
+    <string name="share_playstore_link">https://play.google.com/store/apps/details?id=de.feine_medien.flohmarkt&amp;hl=de</string>
+    <string name="give_feedback_subject">Feedback zur Android App Flohmarkt Termine</string>
+    <string name="change">Ändern</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

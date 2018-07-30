@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group>
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/ic_search"
+            android:title="Suche" />
+        <item
+            android:id="@+id/nav_bookmark"
+            android:icon="@drawable/ic_bookmarks"
+            android:title="Merkzettel" />
+    </group>
+
+    <item android:title="Mehr">
+        <menu>
+            <item
+                android:id="@+id/nav_imprint"
+                android:icon="@drawable/ic_info"
+                android:title="Impressum" />
+            <item
+                android:id="@+id/nav_privacy"
+                android:icon="@drawable/ic_lock"
+                android:title="Datenschutz" />
+            <item
+                android:id="@+id/nav_agb"
+                android:icon="@drawable/ic_agb"
+                android:title="AGB" />
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Teilen" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Feedback senden" />
+        </menu>
+    </item>
+
+</menu>

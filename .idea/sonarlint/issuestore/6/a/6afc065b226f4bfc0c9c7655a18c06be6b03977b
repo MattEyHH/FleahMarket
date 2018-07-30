@@ -1,0 +1,6 @@
+
+Ysquid:UselessImportCheck"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8ü¨÷…Î,
+Bsquid:S1172"&Remove these unused method parameters.(éªÈ½8ü¨÷…Î,
+Dsquid:S1185"(Remove this method to simply inherit it.(À±†”8ü¨÷…Î,
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(…µˆ£üÿÿÿÿ8ü¨÷…Î,
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(›øÝÉþÿÿÿÿ8ü¨÷…Î,
