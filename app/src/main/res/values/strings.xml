@@ -13,6 +13,9 @@
     <string name="share_playstore_link">https://play.google.com/store/apps/details?id=de.feine_medien.flohmarkt&amp;hl=de</string>
     <string name="give_feedback_subject">Feedback zur Android App Flohmarkt Termine</string>
     <string name="change">Ändern</string>
+    <string name="organizer">Veranstalter</string>
+    <string name="add_to_calender">Zum Kalender hinzufügen</string>
+    <string name="add_to_bookmarks">In Merkzettel speichern</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
