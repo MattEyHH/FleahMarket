@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.event.OnLoadAllMarketsSuccessfulEvent
+import de.feine_medien.flohmarkt.event.OnNoGeoPermissionGivenEvent
 import de.feine_medien.flohmarkt.model.Market
 import kotlinx.android.synthetic.main.fragment_search.*
 import org.greenrobot.eventbus.EventBus
@@ -37,11 +38,22 @@ class SearchFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onEvent(event: OnLoadAllMarketsSuccessfulEvent) {
         events = event.markets
+        loadListFragment()
 
+        progress.visibility = View.GONE
+    }
+
+    @Subscribe(sticky = true)
+    fun onEvent(event: OnNoGeoPermissionGivenEvent) {
+        loadListFragment()
+
+        progress.visibility = View.GONE
+    }
+
+    private fun loadListFragment() {
         searchListFragment = SearchListFragment()
 
         fragmentManager?.beginTransaction()?.add(R.id.fl_search, searchListFragment)?.commit()
-        progress.visibility = View.GONE
     }
 
     companion object {

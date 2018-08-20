@@ -26,7 +26,7 @@ class ImprintFragment : Fragment() {
         val webSettings = wv_imprint.settings
         webSettings.javaScriptEnabled = true
 
-        wv_imprint.loadUrl(BuildConfig.IMPRINT_URL)
+        wv_imprint.loadUrl("file:///android_asset/imprint.htm")
     }
 
     companion object {

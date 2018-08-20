@@ -1,9 +1,12 @@
 package de.feine_medien.flohmarkt.main
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
@@ -14,25 +17,67 @@ import android.view.Menu
 import android.view.MenuItem
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.bookmarks.BookmarksFragment
+import de.feine_medien.flohmarkt.event.OnGeoLocationFoundEvent
 import de.feine_medien.flohmarkt.rights.AgbFragment
 import de.feine_medien.flohmarkt.rights.ImprintFragment
 import de.feine_medien.flohmarkt.rights.PrivacyFragment
 import de.feine_medien.flohmarkt.search.SearchFragment
+import de.feine_medien.flohmarkt.util.CurrentLocationListener
+import de.feine_medien.flohmarkt.util.PreferencesHandler
 import de.feine_medien.flohmarkt.webservice.Webservice
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private var webservice = Webservice()
+    private var showMapIcon = true
+    private var isFirstAppStart: Boolean = true
 
-    @SuppressLint("ResourceAsColor")
+    private lateinit var currentDate: String
+    private lateinit var preferences: PreferencesHandler
+
+    @SuppressLint("ResourceAsColor", "SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        preferences = PreferencesHandler(this)
+        isFirstAppStart = preferences.isFirstAppStart()
+
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+        currentDate = mdformat.format(calendar.time)
+
+        handleFragmentStart()
+        setupNavigationDrawerLayout()
+    }
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+
+    private fun handleFragmentStart() {
         var fragment: Fragment? = null
         var fragmentClass: Class<*>? = null
         fragmentClass = SearchFragment::class.java
@@ -44,23 +89,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val fragmentManager = supportFragmentManager
         fragment?.let { fragmentManager.beginTransaction().replace(R.id.fl_content, it).commit() }
+    }
 
+    private fun setupNavigationDrawerLayout() {
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
-
-        webservice.loadAllEvents()
-    }
-
-    override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -70,12 +107,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_search -> return true
+        return when (item.itemId) {
+            R.id.action_search -> {
+                showMapIcon = true
+                invalidateOptionsMenu()
+                true
+            }
 
-            R.id.action_map -> return true
-            else -> return super.onOptionsItemSelected(item)
+            R.id.action_map -> {
+                showMapIcon = false
+                invalidateOptionsMenu()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        super.onPrepareOptionsMenu(menu)
+
+        val itemSearch = menu?.findItem(R.id.action_search)
+        val itemMap = menu?.findItem(R.id.action_map)
+
+        if (showMapIcon) {
+            itemSearch?.isVisible = false
+            itemMap?.isVisible = true
+        } else if (!showMapIcon) {
+            itemSearch?.isVisible = true
+            itemMap?.isVisible = false
+        }
+
+        return true
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -151,5 +213,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         intent.data = data
 
         startActivity(intent)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun makeOnboardingCall() {
+        val map = HashMap<String, String>()
+
+        map.put("c", "hamburg")
+        map.put("t", "7")
+        map.put("d", currentDate)
+
+        webservice.loadEventsByDynamicCall(map)
+    }
+
+    @Subscribe(sticky = true)
+    fun onEvent(event: OnGeoLocationFoundEvent) {
+        if (isFirstAppStart) {
+            makeOnboardingCall()
+            preferences.putFirstAppStart(false)
+        } else {
+            if (event.lat != 0.0 && event.long != 0.0) {
+                val map = HashMap<String, String>()
+                map.put("latitude", event.lat.toString())
+                map.put("longitude", event.long.toString())
+                map.put("radius", "20")
+                map.put("t", "7")
+                map.put("d", currentDate)
+
+                webservice.loadEventsByDynamicCall(map)
+            }
+        }
     }
 }

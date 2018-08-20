@@ -16,6 +16,44 @@
     <string name="organizer">Veranstalter</string>
     <string name="add_to_calender">Zum Kalender hinzufügen</string>
     <string name="add_to_bookmarks">In Merkzettel speichern</string>
+    <string name="description">Beschreibung</string>
+    <string name="more_description">mehr…</string>
+    <string name="less_description">…weniger</string>
+    <string name="make_call">Anrufen</string>
+    <string name="add_to_contacts">Zu Kontakten hinzufügen</string>
+    <string name="no_geo_part_1">Standort konnte nicht</string>
+    <string name="no_geo_part_2">ermittelt werden.</string>
+    <string name="no_calendar_app_installed">Keine Kalender App installiert</string>
+    <string name="detail_notice">Trotz sorgfältiger Recherche kann es zu Irrtümern oder kurzfristigen Absagen kommen. Für die Richtigkeit und die Aktualität der gemachten Angaben, insbesondere für Termine und Preise übernehmen wir keine Gewähr. Bitte wenden Sie sich im Zweifel an den Veranstalter und vergewissern Sie sich ob Termine, Preise, Veranstaltungsorte etc. Noch Ihre Gültigkeit haben.</string>
+
+    <string name="upper_area">UMKREIS</string>
+    <string name="current_place">Aktueller Ort</string>
+    <string name="zip_location">PLZ / Ort</string>
+    <string name="area">Umkreis</string>
+    <string name="upper_period">ZEITRAUM</string>
+    <string name="from">ab</string>
+    <string name="in_the_following">in den folgenen</string>
+    <string name="upper_market">MARKT</string>
+    <string name="all_categories">Alle Kategorien</string>
+    <string name="antik_market">Antikmarkt</string>
+    <string name="flea_market">Flohmarkt</string>
+    <string name="art_work">Kunsthandwerk</string>
+    <string name="city_party">Stadtfest</string>
+    <string name="collection">Sammelbörse</string>
+    <string name="upper_roof">ÜBERDACHUNG</string>
+    <string name="no_input">keine Angabe</string>
+    <string name="no_roof">nicht überdacht</string>
+    <string name="part_roof">teilw. überdacht</string>
+    <string name="full_roof">überdacht</string>
+    <string name="show_me_in_following_days">Zeige mir Events in den nächsten:</string>
+    <string name="no_results_found">Zu diesen Kriterien, wurden keine Ergebnisse gefunden.</string>
+    <string name="no_city_or_zip">Wenn Sie nicht Ihren aktuellen Standort für die Suche verwenden, müssen Sie eine Stadt oder eine Postleitzahl angeben.</string>
+
+    <string-array name="following_days_items">
+        <item>7 Tagen</item>
+        <item>14 Tagen</item>
+        <item>30 Tagen</item>
+    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

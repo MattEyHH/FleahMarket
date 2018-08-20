@@ -13,7 +13,7 @@ import de.feine_medien.flohmarkt.model.Market
 import kotlinx.android.synthetic.main.view_flea_market_item.view.*
 import org.greenrobot.eventbus.EventBus
 
-class SearchAdapter internal constructor(val activity: FragmentActivity?, private val markets: List<Market>) : RecyclerView.Adapter<SearchAdapter.SearchItemViewHolder>() {
+class SearchAdapter internal constructor(private val fragmentActivity: FragmentActivity?, private val markets: MutableList<Market>) : RecyclerView.Adapter<SearchAdapter.SearchItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchItemViewHolder {
         return SearchItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_flea_market_item, parent, false))
@@ -24,15 +24,20 @@ class SearchAdapter internal constructor(val activity: FragmentActivity?, privat
         holder.setMarkets(market, (markets.size - 1) == position)
 
         holder.item.setOnClickListener {
-            val detailIntent = Intent(activity, DetailActivity::class.java)
-            activity?.startActivity(detailIntent)
-
             EventBus.getDefault().postSticky(OnMarketClickedEvent(market))
+
+            val detailIntent = Intent(fragmentActivity, DetailActivity::class.java)
+            fragmentActivity?.startActivity(detailIntent)
         }
     }
 
     override fun getItemCount(): Int {
         return markets.size
+    }
+
+    fun clear() {
+        markets.clear()
+        notifyDataSetChanged()
     }
 
     class SearchItemViewHolder(val item: View) : RecyclerView.ViewHolder(item) {

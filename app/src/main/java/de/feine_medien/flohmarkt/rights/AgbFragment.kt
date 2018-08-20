@@ -28,7 +28,7 @@ class AgbFragment : Fragment() {
         val webSettings = wv_agb.settings
         webSettings.javaScriptEnabled = true
 
-        wv_agb.loadUrl(BuildConfig.AGB_URL)
+        wv_agb.loadUrl("file:///android_asset/tc.htm")
     }
 
     companion object {

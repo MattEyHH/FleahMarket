@@ -11,9 +11,12 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import de.feine_medien.flohmarkt.BuildConfig;
 import de.feine_medien.flohmarkt.event.OnLoadAllMarketsSuccessfulEvent;
+import de.feine_medien.flohmarkt.event.OnNoResultsFoundEvent;
+import de.feine_medien.flohmarkt.event.OnNoZipOrCitySelectedEvent;
 import de.feine_medien.flohmarkt.model.Market;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -58,6 +61,48 @@ public class Webservice {
         });
     }
 
+    public void loadEventsByDynamicCall(final Map<String, String> map) {
+        flohmarktService.getEventsByDynamicCall(map).enqueue(new LoggingCallback<JsonObject>() {
+            @Override
+            void onSuccess(JsonObject responseBody, boolean isCached) {
+                try {
+                    JsonObject events = responseBody.getAsJsonObject("events");
+                    List<Market> allMarkets = new ArrayList<>();
+
+                    for (String key : events.keySet()) {
+                        if (TextUtils.isDigitsOnly(key)) {
+                            JsonObject subObject = events.getAsJsonObject(key);
+                            String fleaMarketId = subObject.keySet().iterator().next();
+                            JsonObject fleaMarket = subObject.getAsJsonObject(fleaMarketId);
+                            fleaMarket.addProperty("id", fleaMarketId);
+                            Gson gson = new Gson();
+                            Market market = gson.fromJson(fleaMarket.toString(), Market.class);
+
+                            allMarkets.add(market);
+                        }
+                    }
+                    EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(allMarkets));
+                } catch (Exception e) {
+                    JsonObject error = responseBody.getAsJsonObject("error");
+                    String errorMessage = error.get("message").getAsString();
+                    switch (errorMessage) {
+                        case "No Results":
+                            EventBus.getDefault().postSticky(new OnNoResultsFoundEvent());
+                            break;
+                        case "No Zip or City":
+                            EventBus.getDefault().postSticky(new OnNoZipOrCitySelectedEvent());
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            void onFailure() {
+                super.onFailure();
+            }
+        });
+    }
+
     public void loadAllEvents() {
         flohmarktService.getAllEvents().enqueue(new LoggingCallback<JsonObject>() {
             @Override
@@ -68,11 +113,11 @@ public class Webservice {
                 for (String key : events.keySet()) {
                     if (TextUtils.isDigitsOnly(key)) {
                         JsonObject subObject = events.getAsJsonObject(key);
-                        String fleahMarketId = subObject.keySet().iterator().next();
-                        JsonObject fleahMarket = subObject.getAsJsonObject(fleahMarketId);
-                        fleahMarket.addProperty("id", fleahMarketId);
+                        String fleaMarketId = subObject.keySet().iterator().next();
+                        JsonObject fleaMarket = subObject.getAsJsonObject(fleaMarketId);
+                        fleaMarket.addProperty("id", fleaMarketId);
                         Gson gson = new Gson();
-                        Market market = gson.fromJson(fleahMarket.toString(), Market.class);
+                        Market market = gson.fromJson(fleaMarket.toString(), Market.class);
 
                         allMarkets.add(market);
                     }
@@ -93,10 +138,12 @@ public class Webservice {
         public final void onResponse(@NonNull final Call<T> call, @NonNull final Response<T> response) {
             if (response.isSuccessful() && (response.body() != null)) {
                 onSuccess(response.body(), response.code() == HTTP_NOT_MODIFIED);
+                call.request().url();
 
             } else {
                 logFailure(call, response);
                 onFailure();
+                call.request().url();
             }
         }
 

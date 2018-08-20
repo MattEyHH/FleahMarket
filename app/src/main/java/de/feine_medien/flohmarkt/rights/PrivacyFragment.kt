@@ -28,7 +28,7 @@ class PrivacyFragment : Fragment() {
         val webSettings = wv_privacy.settings
         webSettings.javaScriptEnabled = true
 
-        wv_privacy.loadUrl(BuildConfig.PRIVACY_URL)
+        wv_privacy.loadUrl("file:///android_asset/privacy_policy.htm")
     }
 
     companion object {
