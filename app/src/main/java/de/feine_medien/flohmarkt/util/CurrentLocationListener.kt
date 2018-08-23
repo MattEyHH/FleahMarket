@@ -3,19 +3,14 @@ package de.feine_medien.flohmarkt.util
 import android.location.Location
 import android.location.LocationListener
 import android.os.Bundle
+import de.feine_medien.flohmarkt.event.OnLocationProviderDisabledEvent
+import org.greenrobot.eventbus.EventBus
 
 class CurrentLocationListener : LocationListener {
 
     companion object {
         var latitude: Double? = 0.0
         var longitude: Double? = 0.0
-
-        fun onLocationIsNotEmpty(): Boolean {
-            if (latitude != 0.0 && longitude != 0.0) {
-                return true
-            }
-            return false
-        }
     }
 
     override fun onLocationChanged(location: Location?) {
@@ -32,6 +27,6 @@ class CurrentLocationListener : LocationListener {
     }
 
     override fun onProviderDisabled(p0: String?) {
-
+        EventBus.getDefault().post(OnLocationProviderDisabledEvent())
     }
 }

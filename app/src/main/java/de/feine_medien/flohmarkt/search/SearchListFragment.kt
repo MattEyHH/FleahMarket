@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.Subscribe
 class SearchListFragment : Fragment() {
 
     private var searchAdapter: SearchAdapter? = null
-    lateinit var bottomSheetDialogFragment: FilterBottomSheetDialogFragment
+    private lateinit var bottomSheetDialogFragment: FilterBottomSheetDialogFragment
 
     override fun onStart() {
         super.onStart()
@@ -69,7 +69,6 @@ class SearchListFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onEvent(event: OnNoResultsFoundEvent) {
         showProgress(false)
-        searchAdapter?.clear()
         tv_no_results.visibility = View.VISIBLE
 
         EventBus.getDefault().removeStickyEvent(event)
@@ -78,7 +77,6 @@ class SearchListFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onEvent(event: OnNoZipOrCitySelectedEvent) {
         showProgress(false)
-        searchAdapter?.clear()
         tv_no_city_or_zip.visibility = View.VISIBLE
 
         EventBus.getDefault().removeStickyEvent(event)
@@ -88,7 +86,7 @@ class SearchListFragment : Fragment() {
     fun onEvent(event: OnLoadAllMarketsSuccessfulEvent) {
         setupRecyclerView(event.markets)
 
-        EventBus.getDefault().removeStickyEvent(event)
+        EventBus.getDefault().unregister(event)
     }
 
     @Subscribe(sticky = true)

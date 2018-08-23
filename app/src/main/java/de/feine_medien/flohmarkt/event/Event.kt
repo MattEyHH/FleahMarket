@@ -12,8 +12,8 @@ data class OnGeoLocationFoundEvent(val lat: Double?, val long: Double?)
 
 class OnNoGeoPermissionGivenEvent()
 
-class OnFilterClosedEvent()
-
 class OnNoResultsFoundEvent()
 
 class OnNoZipOrCitySelectedEvent()
+
+class OnLocationProviderDisabledEvent()

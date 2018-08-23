@@ -19,8 +19,6 @@ import org.greenrobot.eventbus.EventBus
 
 class SplashActivity : AppCompatActivity() {
 
-    //startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-
     companion object {
         const val GEO_REQUEST = 789
     }

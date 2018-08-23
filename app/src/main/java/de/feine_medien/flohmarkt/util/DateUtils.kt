@@ -1,6 +1,5 @@
 package de.feine_medien.flohmarkt.util
 
-import android.text.format.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -8,11 +7,15 @@ import java.util.*
 class DateUtils {
 
     companion object {
-        fun getDateFromTimestampString(timeStamp: Long?): String {
-            val cal = Calendar.getInstance(Locale.GERMANY)
-            cal.timeInMillis = timeStamp!! * 1000L
 
-            return DateFormat.format("dd.MM.yyyy hh:mm", cal).toString()
+        fun getTime(s: String): String {
+            var timeInt = 0
+            try {
+                timeInt = s.split(":")[1].replace("\"", "").toInt()
+            } catch (e: Exception) { }
+            timeInt /= 10000
+
+            return timeInt.toString().padStart(2, '0') + ":00"
         }
 
         fun getDayAsIntegerFromTimestamp(timeStamp: Long?): Int {

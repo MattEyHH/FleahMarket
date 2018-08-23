@@ -1,14 +1,12 @@
 package de.feine_medien.flohmarkt.main
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -21,9 +19,11 @@ import de.feine_medien.flohmarkt.event.OnGeoLocationFoundEvent
 import de.feine_medien.flohmarkt.rights.AgbFragment
 import de.feine_medien.flohmarkt.rights.ImprintFragment
 import de.feine_medien.flohmarkt.rights.PrivacyFragment
+import de.feine_medien.flohmarkt.search.MapsFragment
 import de.feine_medien.flohmarkt.search.SearchFragment
-import de.feine_medien.flohmarkt.util.CurrentLocationListener
+import de.feine_medien.flohmarkt.search.SearchListFragment
 import de.feine_medien.flohmarkt.util.PreferencesHandler
+import de.feine_medien.flohmarkt.util.QueryKeys
 import de.feine_medien.flohmarkt.webservice.Webservice
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -39,10 +39,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var showMapIcon = true
     private var isFirstAppStart: Boolean = true
 
+    private var fragment: Fragment? = null
+    private var fragmentClass: Class<*>? = null
+
+    private lateinit var fragmentManager: FragmentManager
     private lateinit var currentDate: String
     private lateinit var preferences: PreferencesHandler
 
-    @SuppressLint("ResourceAsColor", "SimpleDateFormat")
+    @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,8 +59,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val mdformat = SimpleDateFormat("yyyy-MM-dd")
         currentDate = mdformat.format(calendar.time)
 
-        handleFragmentStart()
         setupNavigationDrawerLayout()
+        handleFragmentStart()
     }
 
     override fun onBackPressed() {
@@ -78,16 +82,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun handleFragmentStart() {
-        var fragment: Fragment? = null
-        var fragmentClass: Class<*>? = null
         fragmentClass = SearchFragment::class.java
         try {
-            fragment = fragmentClass.newInstance() as Fragment
+            fragment = (fragmentClass as Class<*>).newInstance() as Fragment
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        val fragmentManager = supportFragmentManager
+        fragmentManager = supportFragmentManager
         fragment?.let { fragmentManager.beginTransaction().replace(R.id.fl_content, it).commit() }
     }
 
@@ -110,12 +112,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return when (item.itemId) {
             R.id.action_search -> {
                 showMapIcon = true
+
+                val searchListFragment = SearchListFragment()
+                fragmentManager.beginTransaction().replace(R.id.fl_search, searchListFragment).commit()
+
                 invalidateOptionsMenu()
                 true
             }
 
             R.id.action_map -> {
                 showMapIcon = false
+
+                val mapsFragment = MapsFragment()
+                fragmentManager.beginTransaction().replace(R.id.fl_search, mapsFragment).commit()
+
                 invalidateOptionsMenu()
                 true
             }
@@ -141,9 +151,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        var fragment: Fragment? = null
-        var fragmentClass: Class<*>? = null
-
         when (item.itemId) {
             R.id.nav_search -> {
                 fragmentClass = SearchFragment::class.java
@@ -179,7 +186,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             e.printStackTrace()
         }
 
-        val fragmentManager = supportFragmentManager
+        fragmentManager = supportFragmentManager
         fragment?.let { fragmentManager.beginTransaction().replace(R.id.fl_content, it).commit() }
 
         val drawer = drawer_layout as DrawerLayout
@@ -215,13 +222,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(intent)
     }
 
-    @SuppressLint("SimpleDateFormat")
     private fun makeOnboardingCall() {
         val map = HashMap<String, String>()
 
-        map.put("c", "hamburg")
-        map.put("t", "7")
-        map.put("d", currentDate)
+        map.put(QueryKeys.CITY_KEY, "hamburg")
+        map.put(QueryKeys.DAYS_KEY, "7")
+        map.put(QueryKeys.DATE_KEY, currentDate)
 
         webservice.loadEventsByDynamicCall(map)
     }
@@ -234,14 +240,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             if (event.lat != 0.0 && event.long != 0.0) {
                 val map = HashMap<String, String>()
-                map.put("latitude", event.lat.toString())
-                map.put("longitude", event.long.toString())
-                map.put("radius", "20")
-                map.put("t", "7")
-                map.put("d", currentDate)
+                map.put(QueryKeys.LAT_KEY, event.lat.toString())
+                map.put(QueryKeys.LONG_KEY, event.long.toString())
+                map.put(QueryKeys.RADIUS_KEY, "20")
+                map.put(QueryKeys.DAYS_KEY, "7")
+                map.put(QueryKeys.DATE_KEY, currentDate)
 
                 webservice.loadEventsByDynamicCall(map)
             }
         }
+        EventBus.getDefault().removeStickyEvent(event)
     }
 }

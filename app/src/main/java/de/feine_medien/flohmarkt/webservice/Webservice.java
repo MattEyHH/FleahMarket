@@ -1,7 +1,9 @@
 package de.feine_medien.flohmarkt.webservice;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,21 +48,6 @@ public class Webservice {
         flohmarktService = restAdapter.create(FlohmarktService.class);
     }
 
-    public void loadConfig() {
-        flohmarktService.getConfig().enqueue(new LoggingCallback<Object>() {
-
-            @Override
-            void onSuccess(Object responseBody, boolean isCached) {
-                //EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(responseBody));
-            }
-
-            @Override
-            void onFailure() {
-                super.onFailure();
-            }
-        });
-    }
-
     public void loadEventsByDynamicCall(final Map<String, String> map) {
         flohmarktService.getEventsByDynamicCall(map).enqueue(new LoggingCallback<JsonObject>() {
             @Override
@@ -82,6 +69,7 @@ public class Webservice {
                         }
                     }
                     EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(allMarkets));
+
                 } catch (Exception e) {
                     JsonObject error = responseBody.getAsJsonObject("error");
                     String errorMessage = error.get("message").getAsString();
@@ -94,35 +82,6 @@ public class Webservice {
                             break;
                     }
                 }
-            }
-
-            @Override
-            void onFailure() {
-                super.onFailure();
-            }
-        });
-    }
-
-    public void loadAllEvents() {
-        flohmarktService.getAllEvents().enqueue(new LoggingCallback<JsonObject>() {
-            @Override
-            void onSuccess(JsonObject responseBody, boolean isCached) {
-                JsonObject events = responseBody.getAsJsonObject("events");
-                List<Market> allMarkets = new ArrayList<>();
-
-                for (String key : events.keySet()) {
-                    if (TextUtils.isDigitsOnly(key)) {
-                        JsonObject subObject = events.getAsJsonObject(key);
-                        String fleaMarketId = subObject.keySet().iterator().next();
-                        JsonObject fleaMarket = subObject.getAsJsonObject(fleaMarketId);
-                        fleaMarket.addProperty("id", fleaMarketId);
-                        Gson gson = new Gson();
-                        Market market = gson.fromJson(fleaMarket.toString(), Market.class);
-
-                        allMarkets.add(market);
-                    }
-                }
-                EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(allMarkets));
             }
 
             @Override

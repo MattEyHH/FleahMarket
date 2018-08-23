@@ -24,6 +24,7 @@
     <string name="no_geo_part_1">Standort konnte nicht</string>
     <string name="no_geo_part_2">ermittelt werden.</string>
     <string name="no_calendar_app_installed">Keine Kalender App installiert</string>
+    <string name="no_maps_app_installed">Keine Maps App installiert</string>
     <string name="detail_notice">Trotz sorgfältiger Recherche kann es zu Irrtümern oder kurzfristigen Absagen kommen. Für die Richtigkeit und die Aktualität der gemachten Angaben, insbesondere für Termine und Preise übernehmen wir keine Gewähr. Bitte wenden Sie sich im Zweifel an den Veranstalter und vergewissern Sie sich ob Termine, Preise, Veranstaltungsorte etc. Noch Ihre Gültigkeit haben.</string>
 
     <string name="upper_area">UMKREIS</string>
@@ -57,4 +58,5 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

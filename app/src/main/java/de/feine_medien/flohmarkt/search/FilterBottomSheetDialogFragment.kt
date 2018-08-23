@@ -9,12 +9,10 @@ import android.support.design.widget.BottomSheetDialogFragment
 import android.view.View
 import android.widget.SeekBar
 import de.feine_medien.flohmarkt.R
-import de.feine_medien.flohmarkt.event.OnFilterClosedEvent
-import de.feine_medien.flohmarkt.event.OnGeoLocationFoundEvent
+import de.feine_medien.flohmarkt.util.CurrentLocationListener
+import de.feine_medien.flohmarkt.util.QueryKeys
 import de.feine_medien.flohmarkt.webservice.Webservice
 import kotlinx.android.synthetic.main.dialog_fragment_filter_bottom_sheet.view.*
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,8 +22,6 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private val params = HashMap<String, String>()
     private val webservice = Webservice()
 
-    private var latitude: Double? = 0.0
-    private var longitude: Double? = 0.0
     private var selectedDays: Int = -1
     private var year: String = ""
     private var month: String = ""
@@ -33,16 +29,6 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private lateinit var filterView: View
     private lateinit var dateFormatter: SimpleDateFormat
-
-    companion object {
-        private const val CATEGORY_KEY = "cid"
-        private const val ROOF_KEY = "options"
-        private const val LAT_KEY = "latitude"
-        private const val LONG_KEY = "longitude"
-        private const val RADIUS_KEY = "radius"
-        private const val DAYS_KEY = "t"
-        private const val DATE_KEY = "d"
-    }
 
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog?, style: Int) {
@@ -54,6 +40,10 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
         setupRadioButtons()
         setupRadiusSeekBar()
         setupDatePicker()
+
+        val df = SimpleDateFormat("dd.MM.yyyy")
+        val formattedDate = df.format(cal.time)
+        filterView.tv_date.text = formattedDate
     }
 
     private fun setupRadiusSeekBar() {
@@ -69,11 +59,11 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
-
+                //noOp
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
-
+                //noOp
             }
 
         })
@@ -117,16 +107,6 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
             val dialog = builder.create()
             dialog.show()
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
-    }
-
-    override fun onStop() {
-        EventBus.getDefault().unregister(this)
-        super.onStop()
     }
 
     private fun setupRadioButtons() {
@@ -188,40 +168,34 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onCancel(dialog: DialogInterface?) {
         super.onCancel(dialog)
 
-        if (latitude != 0.0 || longitude != 0.0) {
-            params.put(LAT_KEY, latitude.toString())
-            params.put(LONG_KEY, longitude.toString())
-            if (filterView.sb_search_radius.progress < 20) {
-                filterView.sb_search_radius.progress = 20
+        if (filterView.rb_current_position.isChecked) {
+            if (CurrentLocationListener.latitude != 0.0 || CurrentLocationListener.longitude != 0.0) {
+                params.put(QueryKeys.LAT_KEY, CurrentLocationListener.latitude.toString())
+                params.put(QueryKeys.LONG_KEY, CurrentLocationListener.longitude.toString())
             }
-            params.put(RADIUS_KEY, filterView.sb_search_radius.progress.toString())
         }
+
+        if (filterView.sb_search_radius.progress < 20) {
+            filterView.sb_search_radius.progress = 20
+        }
+
+        params.put(QueryKeys.RADIUS_KEY, filterView.sb_search_radius.progress.toString())
 
         if (selectedDays >= 0) {
-            params.put(DATE_KEY, "$year-$month-$day")
-            params.put(DAYS_KEY, selectedDays.toString())
+            params.put(QueryKeys.DATE_KEY, "$year-$month-$day")
+            params.put(QueryKeys.DAYS_KEY, selectedDays.toString())
         }
 
         if (getCurrentCategoryState() >= 0) {
-            params.put(CATEGORY_KEY, getCurrentCategoryState().toString())
+            params.put(QueryKeys.CATEGORY_KEY, getCurrentCategoryState().toString())
         }
 
         if (getCurrentCategoryState() >= 0) {
-            params.put(ROOF_KEY, getCurrentRoofState().toString())
+            params.put(QueryKeys.ROOF_KEY, getCurrentRoofState().toString())
         }
 
         if (params.size > 0) {
             webservice.loadEventsByDynamicCall(params)
         }
-
-        EventBus.getDefault().post(OnFilterClosedEvent())
-    }
-
-    @Subscribe(sticky = true)
-    fun onEvent(event: OnGeoLocationFoundEvent) {
-        latitude = event.lat
-        longitude = event.long
-
-        EventBus.getDefault().removeStickyEvent(event)
     }
 }

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.provider.CalendarContract.Events
@@ -105,7 +106,23 @@ class DetailActivity : AppCompatActivity() {
     }
 
     fun openMap() {
-        Toast.makeText(this, "open map", Toast.LENGTH_SHORT).show()
+        var geoString = "geo:"
+
+        market.let {
+            geoString += String.format(Locale.getDefault(), "%s,%s?q=%s,%s %s,%s",
+                    market.addr?.lat, market.addr?.lng,
+                    market.addr?.name, market.addr?.street, market.addr?.plz,
+                    market.province?.name)
+        }
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(geoString))
+
+        try {
+            this.startActivity(intent)
+
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, getString(R.string.no_maps_app_installed), Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onStart() {
@@ -124,7 +141,7 @@ class DetailActivity : AppCompatActivity() {
 
         tv_title.text = market.event?.title
         tv_location.text = market.addr?.location
-        tv_date.text = "${market.event?.date} ${market.event?.tstart}-${market.event?.tend}"
+        tv_date.text = "${market.event?.date} ${DateUtils.getTime(market.event?.tstart.toString())}-${DateUtils.getTime(market.event?.tend.toString())}"
         tv_address.text = market.addr?.street
         tv_zipcode.text = "${market.addr?.plz} ${market.addr?.name}"
         tv_city.text = market.province?.name
@@ -133,10 +150,9 @@ class DetailActivity : AppCompatActivity() {
 
     @Subscribe(sticky = true)
     fun onEvent(event: OnMarketClickedEvent) {
-
         supportActionBar?.title = event.market.event?.title
-
         initDetailView(event.market)
+
         EventBus.getDefault().removeStickyEvent(event)
     }
 
@@ -166,7 +182,6 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showNotInstalledToast() {
-        val noAppInstalled = getString(R.string.no_calendar_app_installed)
-        Toast.makeText(this, noAppInstalled, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.no_calendar_app_installed), Toast.LENGTH_SHORT).show()
     }
 }
