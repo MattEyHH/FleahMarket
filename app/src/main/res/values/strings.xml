@@ -1,4 +1,12 @@
 <resources>
+    <string name="admob_app_id">ca-app-pub-7162024436144124~3398524947</string>
+    <string name="admob_puplisher_id">ca-app-pub-7162024436144124/3108801650</string>
+
+    <string name="search">Suchen</string>
+    <string name="bookmark">Merkzettel</string>
+    <string name="imprint">Impressum</string>
+    <string name="privacy">Datenschutz</string>
+    <string name="agb">AGB</string>
     <string name="app_name">Flohmarkt Termine</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -16,15 +24,19 @@
     <string name="organizer">Veranstalter</string>
     <string name="add_to_calender">Zum Kalender hinzufügen</string>
     <string name="add_to_bookmarks">In Merkzettel speichern</string>
+    <string name="added_to_bookmarks">Zur Merkliste hinzugefügt</string>
     <string name="description">Beschreibung</string>
     <string name="more_description">mehr…</string>
     <string name="less_description">…weniger</string>
     <string name="make_call">Anrufen</string>
+    <string name="search_radius">Suche innerhalb </string>
     <string name="add_to_contacts">Zu Kontakten hinzufügen</string>
     <string name="no_geo_part_1">Standort konnte nicht</string>
     <string name="no_geo_part_2">ermittelt werden.</string>
     <string name="no_calendar_app_installed">Keine Kalender App installiert</string>
     <string name="no_maps_app_installed">Keine Maps App installiert</string>
+    <string name="no_location_available">Kein Standort verfügbar"</string>
+    <string name="no_geo_permission_given">Sie haben die Standortfreigabe nicht erteilt</string>
     <string name="detail_notice">Trotz sorgfältiger Recherche kann es zu Irrtümern oder kurzfristigen Absagen kommen. Für die Richtigkeit und die Aktualität der gemachten Angaben, insbesondere für Termine und Preise übernehmen wir keine Gewähr. Bitte wenden Sie sich im Zweifel an den Veranstalter und vergewissern Sie sich ob Termine, Preise, Veranstaltungsorte etc. Noch Ihre Gültigkeit haben.</string>
 
     <string name="upper_area">UMKREIS</string>

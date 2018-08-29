@@ -8,35 +8,53 @@ import android.content.DialogInterface
 import android.support.design.widget.BottomSheetDialogFragment
 import android.view.View
 import android.widget.SeekBar
+import android.widget.Toast
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.places.Places
 import de.feine_medien.flohmarkt.R
-import de.feine_medien.flohmarkt.util.CurrentLocationListener
+import de.feine_medien.flohmarkt.event.OnNoGeoPermissionGivenEvent
+import de.feine_medien.flohmarkt.event.OnRadiusValueHasChangedEvent
+import de.feine_medien.flohmarkt.main.MainActivity
 import de.feine_medien.flohmarkt.util.QueryKeys
 import de.feine_medien.flohmarkt.webservice.Webservice
 import kotlinx.android.synthetic.main.dialog_fragment_filter_bottom_sheet.view.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 
-class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
+
+class FilterBottomSheetDialogFragment : BottomSheetDialogFragment(), GoogleApiClient.OnConnectionFailedListener {
+
+    private val latLngBounds = LatLngBounds(LatLng(-40.0, -168.0), LatLng(71.0, 136.0))
     private val cal = Calendar.getInstance(Locale.GERMANY)
     private val params = HashMap<String, String>()
     private val webservice = Webservice()
 
-    private var selectedDays: Int = -1
+    private var currentDate: String = ""
+    private var currentApiDate: String = ""
     private var year: String = ""
     private var month: String = ""
     private var day: String = ""
+    private var selectedDays: Int = -1
 
     private lateinit var filterView: View
     private lateinit var dateFormatter: SimpleDateFormat
+    private lateinit var apiFormatter: SimpleDateFormat
+    private lateinit var placeAutocompleteAdapter: PlaceAutocompleteAdapter
 
-    @SuppressLint("RestrictedApi")
+    @SuppressLint("RestrictedApi", "SimpleDateFormat")
     override fun setupDialog(dialog: Dialog?, style: Int) {
         super.setupDialog(dialog, style)
 
         filterView = View.inflate(context, R.layout.dialog_fragment_filter_bottom_sheet, null)
         dialog?.setContentView(filterView)
 
+        setupPlaceAutoCompleteAdapter()
         setupRadioButtons()
         setupRadiusSeekBar()
         setupDatePicker()
@@ -46,9 +64,38 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
         filterView.tv_date.text = formattedDate
     }
 
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+
+    private fun setupPlaceAutoCompleteAdapter() {
+        val googleApiClient = GoogleApiClient
+                .Builder(context!!)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(activity!!, this)
+                .build()
+
+
+        placeAutocompleteAdapter = PlaceAutocompleteAdapter(context, googleApiClient, latLngBounds, null)
+
+        filterView.tv_auto_complete.setAdapter(placeAutocompleteAdapter)
+    }
+
+    override fun onConnectionFailed(p0: ConnectionResult) {
+        Toast.makeText(context, "Service nicht erreichbar", Toast.LENGTH_SHORT).show()
+    }
+
     private fun setupRadiusSeekBar() {
         filterView.sb_search_radius.max = 200
         filterView.sb_search_radius.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, p2: Boolean) {
                 var newProgress = progress
                 if (newProgress < 20) {
@@ -56,6 +103,7 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     seekBar?.progress = newProgress
                 }
                 filterView.tv_search_km.text = "${newProgress}km"
+                EventBus.getDefault().post(OnRadiusValueHasChangedEvent(newProgress))
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -65,17 +113,26 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
             override fun onStopTrackingTouch(p0: SeekBar?) {
                 //noOp
             }
-
         })
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupDatePicker() {
         dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY)
+        apiFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY)
+        currentDate = dateFormatter.format(cal.time)
+        currentApiDate = apiFormatter.format(cal.time)
+
         val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
             cal.set(Calendar.YEAR, year)
             cal.set(Calendar.MONTH, monthOfYear)
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            filterView.tv_date.text = dateFormatter.format(cal.time)
+
+            val month = monthOfYear + 1
+
+            currentDate = "$dayOfMonth.$month.$year"
+            currentApiDate = "$year-$month-$dayOfMonth"
+            filterView.tv_date.text = currentDate
         }
 
         filterView.tv_date.setOnClickListener {
@@ -169,9 +226,9 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.onCancel(dialog)
 
         if (filterView.rb_current_position.isChecked) {
-            if (CurrentLocationListener.latitude != 0.0 || CurrentLocationListener.longitude != 0.0) {
-                params.put(QueryKeys.LAT_KEY, CurrentLocationListener.latitude.toString())
-                params.put(QueryKeys.LONG_KEY, CurrentLocationListener.longitude.toString())
+            if (MainActivity.currentLatitude != 0.0 || MainActivity.currentLongitude != 0.0) {
+                params.put(QueryKeys.LAT_KEY, MainActivity.currentLatitude.toString())
+                params.put(QueryKeys.LONG_KEY, MainActivity.currentLongitude.toString())
             }
         }
 
@@ -181,9 +238,12 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         params.put(QueryKeys.RADIUS_KEY, filterView.sb_search_radius.progress.toString())
 
+        params.put(QueryKeys.DATE_KEY, currentApiDate)
+
         if (selectedDays >= 0) {
-            params.put(QueryKeys.DATE_KEY, "$year-$month-$day")
             params.put(QueryKeys.DAYS_KEY, selectedDays.toString())
+        } else {
+            params.put(QueryKeys.DAYS_KEY, "7")
         }
 
         if (getCurrentCategoryState() >= 0) {
@@ -197,5 +257,15 @@ class FilterBottomSheetDialogFragment : BottomSheetDialogFragment() {
         if (params.size > 0) {
             webservice.loadEventsByDynamicCall(params)
         }
+    }
+
+    @Subscribe(sticky = true)
+    fun onEvent(event: OnNoGeoPermissionGivenEvent) {
+        filterView.rb_current_position.isChecked = false
+        filterView.rb_current_position.isEnabled = false
+        filterView.rb_current_position.setOnClickListener {
+            Toast.makeText(context, getString(R.string.no_geo_permission_given), Toast.LENGTH_SHORT).show()
+        }
+        filterView.rb_zip_area.isChecked = true
     }
 }

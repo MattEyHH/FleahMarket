@@ -10,11 +10,16 @@ import de.feine_medien.flohmarkt.R
 
 class SearchFragment : Fragment() {
 
+    companion object {
+        fun newInstance(): SearchFragment {
+            return newInstance()
+        }
+    }
+
     private lateinit var searchListFragment: SearchListFragment
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
@@ -28,11 +33,5 @@ class SearchFragment : Fragment() {
         searchListFragment = SearchListFragment()
 
         fragmentManager?.beginTransaction()?.replace(R.id.fl_search, searchListFragment)?.commit()
-    }
-
-    companion object {
-        fun newInstance(): SearchFragment {
-            return newInstance()
-        }
     }
 }

@@ -1,19 +1,24 @@
 package de.feine_medien.flohmarkt.event
 
+import android.location.Location
 import de.feine_medien.flohmarkt.model.Market
 
 data class OnLoadAllMarketsSuccessfulEvent(val markets: List<Market>)
 
-data class OnMarketClickedEvent(val market: Market)
-
 data class OnOrganizerButtonClickedEvent(val market: Market)
 
-data class OnGeoLocationFoundEvent(val lat: Double?, val long: Double?)
+data class OnAddMarketToBookmarksEvent(val market: Market)
 
-class OnNoGeoPermissionGivenEvent()
+data class OnGeoLocationFoundEvent(val location: Location)
 
-class OnNoResultsFoundEvent()
+data class OnFirstProvinceLocatedEvent(val province: String)
 
-class OnNoZipOrCitySelectedEvent()
+data class OnRadiusValueHasChangedEvent(val progress: Int)
 
-class OnLocationProviderDisabledEvent()
+data class OnLoadSavedMarketsFromPreferencesEvent(val markets: List<Market>)
+
+class OnNoGeoPermissionGivenEvent
+
+class OnNoResultsFoundEvent
+
+class OnNoZipOrCitySelectedEvent

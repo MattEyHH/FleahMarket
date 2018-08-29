@@ -1,0 +1,7 @@
+
+=squid:S1172t"&Remove these unused method parameters.(éªÈ½
+Zsquid:UselessImportCheck"1Remove this unused import 'android.widget.Toast'.(©›ïÍúÿÿÿÿ
+?squid:S1185Z"(Remove this method to simply inherit it.(À±†”
+Xsquid:UselessImportCheck"4Remove this unused import 'android.content.Context'.(©Ê‰è
+gsquid:S1301N"KReplace this "switch" statement by "if" statements to increase readability.(ãÆÌØýÿÿÿÿ
+U"squid:SwitchLastCaseIsDefaultCheckN""Add a default case to this switch.(ãÆÌØýÿÿÿÿ

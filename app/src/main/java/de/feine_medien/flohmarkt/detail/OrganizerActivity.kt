@@ -22,18 +22,25 @@ import org.greenrobot.eventbus.Subscribe
 
 class OrganizerActivity : AppCompatActivity() {
 
-    private lateinit var market: Market
-
     companion object {
         const val CALL_REQUEST = 567
     }
+
+    private lateinit var market: Market
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_organizer)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setupActionBar()
+        setupClickListeners()
+    }
 
+    private fun setupActionBar() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun setupClickListeners() {
         btn_make_call.setOnClickListener {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                     != PackageManager.PERMISSION_GRANTED) {

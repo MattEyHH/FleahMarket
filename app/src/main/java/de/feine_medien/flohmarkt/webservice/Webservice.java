@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.feine_medien.flohmarkt.BuildConfig;
+import de.feine_medien.flohmarkt.event.OnFirstProvinceLocatedEvent;
 import de.feine_medien.flohmarkt.event.OnLoadAllMarketsSuccessfulEvent;
 import de.feine_medien.flohmarkt.event.OnNoResultsFoundEvent;
 import de.feine_medien.flohmarkt.event.OnNoZipOrCitySelectedEvent;
@@ -68,6 +69,7 @@ public class Webservice {
                             allMarkets.add(market);
                         }
                     }
+                    EventBus.getDefault().postSticky(new OnFirstProvinceLocatedEvent(allMarkets.get(0).getProvince().getName()));
                     EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(allMarkets));
 
                 } catch (Exception e) {
@@ -108,13 +110,11 @@ public class Webservice {
 
         @Override
         public final void onFailure(@NonNull final Call<T> call, @NonNull final Throwable t) {
-            //Crashlytics.logException(t);
             onFailure();
         }
 
         private void logFailure(@NonNull final Call<T> call, @NonNull final Response<T> response) {
-            //Crashlytics.logException(new NetworkErrorException(String.format(Locale.getDefault(),
-            //"Call [%s] failed with response [%s]", call, response)));
+            //noOp
         }
 
         abstract void onSuccess(final T responseBody, final boolean isCached);

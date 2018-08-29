@@ -1,3 +1,7 @@
 package de.feine_medien.flohmarkt.model
 
-data class Province(val id: Int?, val name: String?, val params: Any?)
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class Province(val id: Int?, val name: String?) : Parcelable

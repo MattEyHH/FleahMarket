@@ -10,15 +10,6 @@ import retrofit2.http.QueryMap
 
 interface FlohmarktService {
 
-    @GET("?q=s&c=all")
-    fun getAllEvents(): Call<JsonObject>
-
-    @GET("?q=cnfg")
-    fun getConfig(): Call<Any>
-
     @GET("?q=s")
     fun getEventsByDynamicCall(@QueryMap map: Map<String, String>): Call<JsonObject>
-
-    @POST("/posts/")
-    fun createNewPost(@Body dataJson: JsonObject): Call<Void>
 }

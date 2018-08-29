@@ -1,13 +1,18 @@
 package de.feine_medien.flohmarkt.search
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.MobileAds
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.event.*
+import de.feine_medien.flohmarkt.model.Event
 import de.feine_medien.flohmarkt.model.Market
 import kotlinx.android.synthetic.main.fragment_search_list.*
 import org.greenrobot.eventbus.EventBus
@@ -17,6 +22,7 @@ import org.greenrobot.eventbus.Subscribe
 class SearchListFragment : Fragment() {
 
     private var searchAdapter: SearchAdapter? = null
+
     private lateinit var bottomSheetDialogFragment: FilterBottomSheetDialogFragment
 
     override fun onStart() {
@@ -37,6 +43,9 @@ class SearchListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupAdMobView()
+
         tv_no_city_or_zip.visibility = View.GONE
         tv_no_results.visibility = View.GONE
 
@@ -62,8 +71,20 @@ class SearchListFragment : Fragment() {
         rv_search.adapter?.notifyDataSetChanged()
     }
 
+    private fun setupAdMobView() {
+        MobileAds.initialize(activity, getString(R.string.admob_app_id))
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+    }
+
     private fun showProgress(show: Boolean) {
-        if(show) progress.visibility = View.VISIBLE else progress.visibility = View.GONE
+        if (show) progress.visibility = View.VISIBLE else progress.visibility = View.GONE
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Subscribe
+    fun onEvent(event: OnRadiusValueHasChangedEvent) {
+        tv_search_radius.text = "${getString(R.string.search_radius)} ${event.progress}km"
     }
 
     @Subscribe(sticky = true)
@@ -85,15 +106,11 @@ class SearchListFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onEvent(event: OnLoadAllMarketsSuccessfulEvent) {
         setupRecyclerView(event.markets)
-
-        EventBus.getDefault().unregister(event)
     }
 
     @Subscribe(sticky = true)
-    fun onEvent(event: OnNoGeoPermissionGivenEvent) {
-        showProgress(false)
-        tv_city.text = getString(R.string.no_geo_part_1)
-        tv_search_radius.text = getString(R.string.no_geo_part_2)
+    fun onEvent(event: OnFirstProvinceLocatedEvent) {
+        tv_city.text = event.province
 
         EventBus.getDefault().removeStickyEvent(event)
     }

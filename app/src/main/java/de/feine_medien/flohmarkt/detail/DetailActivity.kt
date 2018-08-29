@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.CalendarContract
 import android.provider.CalendarContract.Events
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -17,30 +18,51 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import de.feine_medien.flohmarkt.R
-import de.feine_medien.flohmarkt.event.OnMarketClickedEvent
+import de.feine_medien.flohmarkt.event.OnAddMarketToBookmarksEvent
 import de.feine_medien.flohmarkt.event.OnOrganizerButtonClickedEvent
 import de.feine_medien.flohmarkt.model.Market
 import de.feine_medien.flohmarkt.util.DateUtils
+import de.feine_medien.flohmarkt.util.PreferencesHandler
 import kotlinx.android.synthetic.main.activity_detail.*
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import java.util.*
 
 
 class DetailActivity : AppCompatActivity() {
 
-    lateinit var market: Market
-
     companion object {
         const val CALENDAR_REQUEST = 234
+        const val EXTRA_MARKET = "extra_market"
+
+        fun getIntent(fragmentActivity: FragmentActivity, market: Market): Intent {
+            val intent = Intent(fragmentActivity, DetailActivity::class.java)
+            intent.putExtra(EXTRA_MARKET, market)
+
+            return intent
+        }
     }
+
+    private lateinit var market: Market
+    private lateinit var preferences: PreferencesHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        market = intent.getParcelableExtra(EXTRA_MARKET)
+        initDetailView(market)
 
+        setupPreferences()
+        setupActionBar()
+        setupClickListeners()
+    }
+
+    private fun setupActionBar() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = market.event?.title
+    }
+
+    private fun setupClickListeners() {
         btn_organizer.setOnClickListener {
             EventBus.getDefault().postSticky(OnOrganizerButtonClickedEvent(market))
 
@@ -71,6 +93,11 @@ class DetailActivity : AppCompatActivity() {
             } else {
                 addEventToCalendar(market)
             }
+        }
+
+        btn_add_to_bookmarks.setOnClickListener {
+            preferences.putMarket(market)
+            Toast.makeText(this, getString(R.string.added_to_bookmarks), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -105,7 +132,11 @@ class DetailActivity : AppCompatActivity() {
         return true
     }
 
-    fun openMap() {
+    private fun setupPreferences() {
+        preferences = PreferencesHandler(this)
+    }
+
+    private fun openMap() {
         var geoString = "geo:"
 
         market.let {
@@ -125,16 +156,6 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
-    }
-
-    override fun onStop() {
-        EventBus.getDefault().unregister(this)
-        super.onStop()
-    }
-
     @SuppressLint("SetTextI18n")
     fun initDetailView(market: Market) {
         this.market = market
@@ -148,21 +169,13 @@ class DetailActivity : AppCompatActivity() {
         tv_description.text = market.event?.text
     }
 
-    @Subscribe(sticky = true)
-    fun onEvent(event: OnMarketClickedEvent) {
-        supportActionBar?.title = event.market.event?.title
-        initDetailView(event.market)
-
-        EventBus.getDefault().removeStickyEvent(event)
-    }
-
     private fun addEventToCalendar(market: Market) {
         val intent = Intent(Intent.ACTION_EDIT)
-        val timeStamp = market.event?.time
+        val timeStamp = market.event?.time?.times(1000L)
 
         intent.type = "vnd.android.cursor.item/event"
         intent.putExtra(Events.TITLE, market.event?.title)
-        intent.putExtra(Events.EVENT_LOCATION, market.addr?.street + "\n" + market.addr?.plz + " " + market.addr?.name)
+        intent.putExtra(Events.EVENT_LOCATION, "${market.addr?.street}\n${market.addr?.plz} ${market.addr?.name}")
         intent.putExtra(Events.DESCRIPTION, market.event?.text)
 
         val calDate = GregorianCalendar(
@@ -171,6 +184,8 @@ class DetailActivity : AppCompatActivity() {
                 DateUtils.getDayAsIntegerFromTimestamp(timeStamp))
 
         intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                calDate.timeInMillis)
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
                 calDate.timeInMillis)
         intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
                 calDate.timeInMillis)
