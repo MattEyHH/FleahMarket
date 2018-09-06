@@ -80,7 +80,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         if (locationProvider.isPermissionGiven) {
             mMap.isMyLocationEnabled = true
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(MainActivity.currentLatitude, MainActivity.currentLongitude), 11f))
+            if (markets.isNotEmpty()) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(markets[0].event?.lat!!, markets[0].event?.lng!!), 11f))
+            } else {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(MainActivity.currentLatitude, MainActivity.currentLongitude), 11f))
+            }
         } else {
             locationProvider.askForPermission(activity, SplashActivity.GEO_REQUEST)
         }

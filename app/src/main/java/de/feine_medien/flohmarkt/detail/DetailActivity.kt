@@ -2,6 +2,7 @@ package de.feine_medien.flohmarkt.detail
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -96,8 +97,26 @@ class DetailActivity : AppCompatActivity() {
         }
 
         btn_add_to_bookmarks.setOnClickListener {
-            preferences.putMarket(market)
-            Toast.makeText(this, getString(R.string.added_to_bookmarks), Toast.LENGTH_SHORT).show()
+            val listItems = resources.getStringArray(R.array.bookmark_notice)
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(getString(R.string.add_with_notice))
+            builder.setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
+                when (i) {
+                    0 -> market.bookmarkNotice = 0
+                    1 -> market.bookmarkNotice = 1
+                    2 -> market.bookmarkNotice = 2
+                    3 -> market.bookmarkNotice = 3
+                }
+
+                preferences.putMarket(market)
+                EventBus.getDefault().postSticky(OnAddMarketToBookmarksEvent())
+                Toast.makeText(this, getString(R.string.added_to_bookmarks), Toast.LENGTH_SHORT).show()
+
+                dialogInterface.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
         }
     }
 

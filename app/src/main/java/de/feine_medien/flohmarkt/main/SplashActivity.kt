@@ -12,6 +12,10 @@ import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.event.OnNoGeoPermissionGivenEvent
 import de.feine_medien.flohmarkt.util.LocationProvider
 import org.greenrobot.eventbus.EventBus
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
+
+
 
 class SplashActivity : AppCompatActivity() {
 
@@ -24,6 +28,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        Fabric.with(this, Crashlytics())
 
         setupLocationProvider()
         geoPermissionCheck()

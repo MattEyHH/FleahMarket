@@ -8,11 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.MobileAds
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.event.*
-import de.feine_medien.flohmarkt.model.Event
 import de.feine_medien.flohmarkt.model.Market
 import kotlinx.android.synthetic.main.fragment_search_list.*
 import org.greenrobot.eventbus.EventBus
@@ -45,9 +43,7 @@ class SearchListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdMobView()
-
-        tv_no_city_or_zip.visibility = View.GONE
-        tv_no_results.visibility = View.GONE
+        hideOtherLayouts()
 
         bottomSheetDialogFragment = FilterBottomSheetDialogFragment()
 
@@ -59,7 +55,14 @@ class SearchListFragment : Fragment() {
         }
     }
 
+    private fun hideOtherLayouts() {
+        tv_no_city_or_zip.visibility = View.GONE
+        tv_no_results.visibility = View.GONE
+    }
+
     private fun setupRecyclerView(markets: List<Market>) {
+        hideOtherLayouts()
+        rv_search.visibility = View.VISIBLE
         searchAdapter = SearchAdapter(activity, markets.toMutableList())
         rv_search.layoutManager = object : LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) {
             override fun canScrollHorizontally(): Boolean {
@@ -87,9 +90,25 @@ class SearchListFragment : Fragment() {
         tv_search_radius.text = "${getString(R.string.search_radius)} ${event.progress}km"
     }
 
+    @Subscribe
+    fun onEvent(event: OnSearchedForMarketsByCurrentPositionEvent) {
+        tv_city.text = getString(R.string.current_location)
+    }
+
+    @Subscribe
+    fun onEvent(event: OnSearchedForMarketsByCityOrZipEvent) {
+        tv_city.text = event.cityOrZip
+    }
+
+    @Subscribe(sticky = true)
+    fun onEvent(event: OnSearchByLastSearchedCityEvent) {
+        tv_city.text = event.city
+    }
+
     @Subscribe(sticky = true)
     fun onEvent(event: OnNoResultsFoundEvent) {
         showProgress(false)
+        rv_search.visibility = View.INVISIBLE
         tv_no_results.visibility = View.VISIBLE
 
         EventBus.getDefault().removeStickyEvent(event)
@@ -106,13 +125,6 @@ class SearchListFragment : Fragment() {
     @Subscribe(sticky = true)
     fun onEvent(event: OnLoadAllMarketsSuccessfulEvent) {
         setupRecyclerView(event.markets)
-    }
-
-    @Subscribe(sticky = true)
-    fun onEvent(event: OnFirstProvinceLocatedEvent) {
-        tv_city.text = event.province
-
-        EventBus.getDefault().removeStickyEvent(event)
     }
 
     companion object {

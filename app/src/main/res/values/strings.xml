@@ -35,12 +35,13 @@
     <string name="no_geo_part_2">ermittelt werden.</string>
     <string name="no_calendar_app_installed">Keine Kalender App installiert</string>
     <string name="no_maps_app_installed">Keine Maps App installiert</string>
-    <string name="no_location_available">Kein Standort verfügbar"</string>
+    <string name="no_location_available">Aktueller Standort konnte nicht ermittelt werden"</string>
     <string name="no_geo_permission_given">Sie haben die Standortfreigabe nicht erteilt</string>
     <string name="detail_notice">Trotz sorgfältiger Recherche kann es zu Irrtümern oder kurzfristigen Absagen kommen. Für die Richtigkeit und die Aktualität der gemachten Angaben, insbesondere für Termine und Preise übernehmen wir keine Gewähr. Bitte wenden Sie sich im Zweifel an den Veranstalter und vergewissern Sie sich ob Termine, Preise, Veranstaltungsorte etc. Noch Ihre Gültigkeit haben.</string>
 
     <string name="upper_area">UMKREIS</string>
     <string name="current_place">Aktueller Ort</string>
+    <string name="current_location">Aktueller Standort</string>
     <string name="zip_location">PLZ / Ort</string>
     <string name="area">Umkreis</string>
     <string name="upper_period">ZEITRAUM</string>
@@ -58,8 +59,13 @@
     <string name="no_roof">nicht überdacht</string>
     <string name="part_roof">teilw. überdacht</string>
     <string name="full_roof">überdacht</string>
+    <string name="search_for_city_or_zip">Nach Ort oder Plz suchen</string>
+    <string name="add_with_notice">Mit Notiz eintragen</string>
     <string name="show_me_in_following_days">Zeige mir Events in den nächsten:</string>
     <string name="no_results_found">Zu diesen Kriterien, wurden keine Ergebnisse gefunden.</string>
+    <string name="no_bookmarks">Sie haben keine Events gespeichert.</string>
+    <string name="really_want_to_delete_event">Event wirklich löschen?</string>
+    <string name="bookmark_deleted_successful">Event wurde entfernt</string>
     <string name="no_city_or_zip">Wenn Sie nicht Ihren aktuellen Standort für die Suche verwenden, müssen Sie eine Stadt oder eine Postleitzahl angeben.</string>
 
     <string-array name="following_days_items">
@@ -68,7 +74,10 @@
         <item>30 Tagen</item>
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_maps">Map</string>
+    <string-array name="bookmark_notice">
+        <item>Nehme ich dran teil</item>
+        <item>Noch unklar</item>
+        <item>Will ich besuchen</item>
+        <item>Kein Stellplatz frei</item>
+    </string-array>
 </resources>

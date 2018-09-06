@@ -2,25 +2,26 @@ package de.feine_medien.flohmarkt.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.MenuItemCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.bookmarks.BookmarksFragment
-import de.feine_medien.flohmarkt.event.OnGeoLocationFoundEvent
-import de.feine_medien.flohmarkt.event.OnLoadAllMarketsSuccessfulEvent
-import de.feine_medien.flohmarkt.event.OnLoadSavedMarketsFromPreferencesEvent
-import de.feine_medien.flohmarkt.event.OnNoGeoPermissionGivenEvent
+import de.feine_medien.flohmarkt.event.*
 import de.feine_medien.flohmarkt.rights.AgbFragment
 import de.feine_medien.flohmarkt.rights.ImprintFragment
 import de.feine_medien.flohmarkt.rights.PrivacyFragment
@@ -50,27 +51,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var showMapIcon = true
     private var fragment: Fragment? = null
     private var fragmentClass: Class<*>? = null
+    private var savedMarketsCount = 0
 
     private lateinit var fragmentManager: FragmentManager
     private lateinit var currentDate: String
     private lateinit var preferences: PreferencesHandler
     private lateinit var locationProvider: LocationProvider
+    private lateinit var bookmarkCount: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        EventBus.getDefault().register(this)
         setSupportActionBar(toolbar)
 
-        preferences = PreferencesHandler(this)
-        getSavedMarketsFromPreferences()
-
-        invalidateOptionsMenu()
-
-        setupLocationProvider()
         setupPreferences()
-        setupCalendar()
         setupNavigationDrawerLayout()
+        getSavedMarketsFromPreferences()
+        invalidateOptionsMenu()
+        setupLocationProvider()
+        setupCalendar()
         handleFragmentStart()
 
         if (currentLatitude != 0.0 && currentLongitude != 0.0) {
@@ -94,6 +93,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
     override fun onStop() {
         EventBus.getDefault().unregister(this)
         super.onStop()
@@ -101,7 +105,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun getSavedMarketsFromPreferences() {
         val savedMarkets = preferences.getSavedMarkets()
+        savedMarketsCount = savedMarkets.size
 
+        bookmarkCount.text = savedMarketsCount.toString()
         EventBus.getDefault().postSticky(OnLoadSavedMarketsFromPreferencesEvent(savedMarkets))
     }
 
@@ -140,6 +146,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+
+        bookmarkCount = MenuItemCompat.getActionView(navigationView.menu.findItem(R.id.nav_bookmark)) as TextView
+        bookmarkCount.gravity = Gravity.CENTER_VERTICAL
+        bookmarkCount.setTypeface(null, Typeface.BOLD)
+        bookmarkCount.setTextColor(resources.getColor(R.color.red))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -267,8 +279,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun makeOnboardingCall() {
         val map = HashMap<String, String>()
+        val lastSearchedCity = preferences.getLastSearchedCity()
+        val lastSearchedLatLng = preferences.getLastSearchedLatLng()
 
-        map.put(QueryKeys.CITY_KEY, "hamburg")
+        if (lastSearchedLatLng != null && (lastSearchedLatLng.latitude != 0.0 && lastSearchedLatLng.longitude != 0.0)) {
+            map.put(QueryKeys.LAT_KEY, lastSearchedLatLng.latitude.toString())
+            map.put(QueryKeys.LONG_KEY, lastSearchedLatLng.longitude.toString())
+            map.put(QueryKeys.RADIUS_KEY, "20")
+
+            EventBus.getDefault().postSticky(OnSearchByLastSearchedCityEvent(lastSearchedCity))
+        } else {
+            map.put(QueryKeys.CITY_KEY, "hamburg")
+        }
         map.put(QueryKeys.DAYS_KEY, "7")
         map.put(QueryKeys.DATE_KEY, currentDate)
 
@@ -277,6 +299,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun makeGeoOnboardingCall() {
         val map = HashMap<String, String>()
+
         map.put(QueryKeys.LAT_KEY, currentLatitude.toString())
         map.put(QueryKeys.LONG_KEY, currentLongitude.toString())
         map.put(QueryKeys.RADIUS_KEY, "20")
@@ -284,6 +307,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         map.put(QueryKeys.DATE_KEY, currentDate)
 
         webservice.loadEventsByDynamicCall(map)
+        EventBus.getDefault().post(OnSearchedForMarketsByCurrentPositionEvent())
+    }
+
+    @Subscribe(sticky = true)
+    fun onEvent(event: OnAddMarketToBookmarksEvent) {
+        savedMarketsCount += 1
+        bookmarkCount.text = savedMarketsCount.toString()
+
+        EventBus.getDefault().removeStickyEvent(event)
+    }
+
+    @Subscribe
+    fun onEvent(event: OnBookmarksCountChangedEvent) {
+        savedMarketsCount -= 1
+        bookmarkCount.text = savedMarketsCount.toString()
     }
 
     @Subscribe(sticky = true)

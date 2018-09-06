@@ -19,6 +19,7 @@
                 android:id="@+id/tv_area"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:paddingTop="8dp"
@@ -39,6 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
+                android:paddingLeft="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/v_divider_1"
@@ -55,6 +57,7 @@
                     android:id="@+id/v_divider_2"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="4dp"
                     android:background="@color/dividerShadow"
@@ -83,6 +86,7 @@
                     android:id="@+id/v_divider_3"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="4dp"
                     android:background="@color/dividerShadow"
@@ -92,15 +96,19 @@
                     android:id="@+id/tv_auto_complete"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="28dp"
                     android:layout_marginStart="28dp"
-                    app:layout_constraintTop_toBottomOf="@id/v_divider_3"
+                    android:hint="@string/search_for_city_or_zip"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintTop_toBottomOf="@id/v_divider_3" />
 
                 <TextView
                     android:id="@+id/tv_search_radius"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/area"
@@ -115,8 +123,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    android:padding="12dp"
                     android:max="200"
+                    android:padding="12dp"
                     app:layout_constraintBottom_toBottomOf="@id/tv_search_radius"
                     app:layout_constraintEnd_toStartOf="@+id/tv_search_km"
                     app:layout_constraintStart_toEndOf="@+id/tv_search_radius"
@@ -127,6 +135,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:text="20km"
                     android:textSize="15sp"
                     app:layout_constraintBottom_toBottomOf="@id/sb_search_radius"
@@ -146,6 +155,7 @@
                 android:id="@+id/tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:paddingTop="8dp"
@@ -166,6 +176,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
+                android:paddingLeft="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/v_divider_5"
@@ -175,6 +186,7 @@
                     android:id="@+id/tv_ab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginStart="32dp"
                     android:padding="4dp"
                     android:text="@string/from"
@@ -188,6 +200,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginStart="8dp"
                     android:gravity="end"
                     android:padding="4dp"
@@ -202,6 +216,7 @@
                     android:id="@+id/v_divider_6"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="4dp"
                     android:background="@color/dividerShadow"
@@ -212,6 +227,7 @@
                     android:id="@+id/tv_in_follow_days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="32dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="8dp"
                     android:padding="4dp"
@@ -226,6 +242,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginStart="8dp"
                     android:gravity="end"
                     android:padding="8dp"
@@ -249,6 +267,7 @@
                 android:id="@+id/tv_market"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:paddingTop="8dp"
@@ -269,6 +288,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
+                android:paddingLeft="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/v_divider_8"
@@ -291,6 +311,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -305,6 +326,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -319,6 +341,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -333,6 +356,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -347,6 +371,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -372,6 +397,7 @@
                 android:id="@+id/tv_roof"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:paddingTop="8dp"
@@ -393,6 +419,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:background="@android:color/white"
+                android:paddingLeft="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 app:layout_constraintTop_toBottomOf="@id/tv_roof"
@@ -415,6 +442,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -429,6 +457,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />
@@ -443,6 +472,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
+                        android:layout_marginLeft="32dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="4dp"
                         android:background="@color/dividerShadow" />

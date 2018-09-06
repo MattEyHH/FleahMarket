@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import de.feine_medien.flohmarkt.R
-import de.feine_medien.flohmarkt.event.OnLoadSavedMarketsFromPreferencesEvent
+import de.feine_medien.flohmarkt.event.OnAllBookmarksDeletedEvent
+import de.feine_medien.flohmarkt.event.OnDeleteBookmarkEvent
 import de.feine_medien.flohmarkt.model.Market
-import de.feine_medien.flohmarkt.search.SearchAdapter
+import de.feine_medien.flohmarkt.util.PreferencesHandler
 import kotlinx.android.synthetic.main.fragment_bookmarks.*
-import kotlinx.android.synthetic.main.fragment_search_list.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -19,6 +19,8 @@ import org.greenrobot.eventbus.Subscribe
 class BookmarksFragment : Fragment() {
 
     private lateinit var bookmarkAdapter: BookmarkAdapter
+    private lateinit var preferences: PreferencesHandler
+    private lateinit var bookmarks: MutableList<Market>
 
     companion object {
         fun newInstance(): BookmarksFragment {
@@ -33,6 +35,10 @@ class BookmarksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        preferences = PreferencesHandler(context!!)
+        bookmarks = preferences.getSavedMarkets().toMutableList()
+        setupRecyclerView(bookmarks)
     }
 
     override fun onStart() {
@@ -46,8 +52,11 @@ class BookmarksFragment : Fragment() {
     }
 
     private fun setupRecyclerView(markets: List<Market>) {
-        bookmarkAdapter = BookmarkAdapter(activity, markets.toMutableList())
-        rv_search.layoutManager = object : LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) {
+        if (bookmarks.size == 0) {
+            tv_no_bookmarks.visibility = View.VISIBLE
+        }
+        bookmarkAdapter = BookmarkAdapter(activity, markets.toMutableList(), context!!)
+        rv_bookmarks.layoutManager = object : LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) {
             override fun canScrollHorizontally(): Boolean {
                 return false
             }
@@ -56,8 +65,23 @@ class BookmarksFragment : Fragment() {
         rv_bookmarks.adapter?.notifyDataSetChanged()
     }
 
-    @Subscribe(sticky = true)
-    fun onEvent(event: OnLoadSavedMarketsFromPreferencesEvent) {
-        setupRecyclerView(event.markets)
+
+    @Subscribe
+    fun onEvent(event: OnAllBookmarksDeletedEvent) {
+        bookmarks.forEach {
+            preferences.putMarket(it)
+        }
+        setupRecyclerView(bookmarks)
+    }
+
+    @Subscribe
+    fun onEvent(event: OnDeleteBookmarkEvent) {
+        preferences.deleteMarkets()
+
+        bookmarks.forEachIndexed { index, market ->
+            if (market.id == event.id) {
+                bookmarks.removeAt(index)
+            }
+        }
     }
 }

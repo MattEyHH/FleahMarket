@@ -57,8 +57,10 @@ class SearchAdapter internal constructor(private val fragmentActivity: FragmentA
 
                 if ((locationA.distanceTo(locationB) / 1000) < 200) {
                     item.tv_distance.text = "${df.format(locationA.distanceTo(locationB) / 1000f)}km"
-                } else {
-                    item.tv_distance.visibility = View.INVISIBLE
+                    if((locationA.distanceTo(locationB) / 1000f) == 0f) {
+                        return
+                    }
+                    item.tv_distance.visibility = View.VISIBLE
                 }
             }
         }

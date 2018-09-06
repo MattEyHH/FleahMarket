@@ -1,10 +1,7 @@
 package de.feine_medien.flohmarkt.webservice;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -16,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.feine_medien.flohmarkt.BuildConfig;
-import de.feine_medien.flohmarkt.event.OnFirstProvinceLocatedEvent;
 import de.feine_medien.flohmarkt.event.OnLoadAllMarketsSuccessfulEvent;
 import de.feine_medien.flohmarkt.event.OnNoResultsFoundEvent;
 import de.feine_medien.flohmarkt.event.OnNoZipOrCitySelectedEvent;
@@ -69,7 +65,6 @@ public class Webservice {
                             allMarkets.add(market);
                         }
                     }
-                    EventBus.getDefault().postSticky(new OnFirstProvinceLocatedEvent(allMarkets.get(0).getProvince().getName()));
                     EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(allMarkets));
 
                 } catch (Exception e) {
