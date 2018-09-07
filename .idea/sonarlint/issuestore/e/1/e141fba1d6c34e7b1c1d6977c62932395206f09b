@@ -1,5 +1,0 @@
-
-Z"squid:SwitchLastCaseIsDefaultCheck""Add a default case to this switch.(ãÆÌØıÿÿÿÿ8Ö±÷Û,
-lsquid:S1301"KReplace this "switch" statement by "if" statements to increase readability.(ãÆÌØıÿÿÿÿ8Ö±÷Û,
-Bsquid:S1172"&Remove these unused method parameters.(éªÈ½8Ö±÷Û,
-Dsquid:S1185"(Remove this method to simply inherit it.(À±†”8Ö±÷Û,

@@ -37,5 +37,17 @@ class DateUtils {
 
             return Integer.parseInt(yearString)
         }
+
+        fun getHoursAsIntegerFromTimestamp(timeStamp: Long?): Int {
+            val yearString = SimpleDateFormat("hh", Locale.GERMANY).format(timeStamp?.let { Date(it) })
+
+            return Integer.parseInt(yearString)
+        }
+
+        fun getMinsAsIntegerFromTimestamp(timeStamp: Long?): Int {
+            val yearString = SimpleDateFormat("mm", Locale.GERMANY).format(timeStamp?.let { Date(it) })
+
+            return Integer.parseInt(yearString)
+        }
     }
 }

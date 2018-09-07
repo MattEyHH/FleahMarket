@@ -26,6 +26,8 @@ import de.feine_medien.flohmarkt.util.DateUtils
 import de.feine_medien.flohmarkt.util.PreferencesHandler
 import kotlinx.android.synthetic.main.activity_detail.*
 import org.greenrobot.eventbus.EventBus
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import java.util.*
 
 
@@ -190,29 +192,38 @@ class DetailActivity : AppCompatActivity() {
 
     private fun addEventToCalendar(market: Market) {
         val intent = Intent(Intent.ACTION_EDIT)
-        val timeStamp = market.event?.time?.times(1000L)
+        val timeStamp = market.event?.time
+        val formatter = DateTimeFormat.forPattern("HHmmss")
+        val unformattedTime = DateTime(timeStamp?.times(1000))
+        val dateTimeStart = formatter.parseDateTime(market.event?.tstart?.let { formatTime(it) })
+        val dateTimeEnd = formatter.parseDateTime(market.event?.tend?.let { formatTime(it) })
 
         intent.type = "vnd.android.cursor.item/event"
         intent.putExtra(Events.TITLE, market.event?.title)
         intent.putExtra(Events.EVENT_LOCATION, "${market.addr?.street}\n${market.addr?.plz} ${market.addr?.name}")
         intent.putExtra(Events.DESCRIPTION, market.event?.text)
 
-        val calDate = GregorianCalendar(
-                DateUtils.getYearAsIntegerFromTimestamp(timeStamp),
-                DateUtils.getMonthAsIntegerFromTimestamp(timeStamp),
-                DateUtils.getDayAsIntegerFromTimestamp(timeStamp))
+        val finalStartTime = unformattedTime.plusHours(dateTimeStart.hourOfDay)
+        val finalEndTime = unformattedTime.plusHours(dateTimeEnd.hourOfDay)
 
         intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                calDate.timeInMillis)
+                finalStartTime.millis)
         intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
-                calDate.timeInMillis)
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
-                calDate.timeInMillis)
+                finalEndTime.millis)
         try {
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             showNotInstalledToast()
         }
+    }
+
+    private fun formatTime(time: String): String {
+        var formattedTime = time
+
+        if (formattedTime.count() < 6) {
+            formattedTime = "0$time"
+        }
+        return formattedTime
     }
 
     private fun showNotInstalledToast() {
