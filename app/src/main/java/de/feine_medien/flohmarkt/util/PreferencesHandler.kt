@@ -15,6 +15,7 @@ data class PreferencesHandler(val context: Context) {
     private val PREF_SAVED_MARKETS = "savedMarkets"
     private val PREF_LAST_SEARCHED_CITY = "lastSearchedCity"
     private val PREF_LAST_SEARCHED_LATLNG = "lastSearchedLatLng"
+    private val PREF_ONBOARDING_NOTIFICATION = "onboardingNotification"
     private val preferences = context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
 
     fun getSavedMarkets(): List<Market> {
@@ -37,6 +38,13 @@ data class PreferencesHandler(val context: Context) {
         editor.putStringSet(PREF_SAVED_MARKETS, currentMarkets)
 
         editor.apply()
+    }
+
+    @SuppressLint("ApplySharedPref")
+    fun deleteMarkets() {
+        val editor = preferences.edit()
+        editor.remove(PREF_SAVED_MARKETS).commit()
+        EventBus.getDefault().post(OnAllBookmarksDeletedEvent())
     }
 
     fun getLastSearchedLatLng(): LatLng? {
@@ -67,10 +75,13 @@ data class PreferencesHandler(val context: Context) {
         editor.apply()
     }
 
-    @SuppressLint("ApplySharedPref")
-    fun deleteMarkets() {
+    fun hasSeenOnBoardingNotification(): Boolean {
+        return preferences.getBoolean(PREF_ONBOARDING_NOTIFICATION, false)
+    }
+
+    fun putOnboardingNotification(hasSeen: Boolean) {
         val editor = preferences.edit()
-        editor.remove(PREF_SAVED_MARKETS).commit()
-        EventBus.getDefault().post(OnAllBookmarksDeletedEvent())
+        editor.putBoolean(PREF_ONBOARDING_NOTIFICATION, true)
+        editor.apply()
     }
 }

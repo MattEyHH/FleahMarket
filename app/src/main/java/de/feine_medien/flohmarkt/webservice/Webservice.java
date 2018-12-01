@@ -2,6 +2,7 @@ package de.feine_medien.flohmarkt.webservice;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -68,15 +69,18 @@ public class Webservice {
                     EventBus.getDefault().postSticky(new OnLoadAllMarketsSuccessfulEvent(allMarkets));
 
                 } catch (Exception e) {
-                    JsonObject error = responseBody.getAsJsonObject("error");
-                    String errorMessage = error.get("message").getAsString();
-                    switch (errorMessage) {
-                        case "No Results":
-                            EventBus.getDefault().postSticky(new OnNoResultsFoundEvent());
-                            break;
-                        case "No Zip or City":
-                            EventBus.getDefault().postSticky(new OnNoZipOrCitySelectedEvent());
-                            break;
+                    if (responseBody != null && responseBody.has("error")) {
+                        JsonObject error = responseBody.getAsJsonObject("error");
+                        if (error.has("message")) {
+                            String errorMessage = error.get("message").getAsString();
+                            switch (errorMessage) {
+                                case "No Zip or City":
+                                    EventBus.getDefault().postSticky(new OnNoZipOrCitySelectedEvent());
+                                    break;
+                                default:
+                                    EventBus.getDefault().postSticky(new OnNoResultsFoundEvent());
+                            }
+                        }
                     }
                 }
             }

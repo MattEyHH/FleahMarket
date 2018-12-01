@@ -1,6 +1,8 @@
 package de.feine_medien.flohmarkt.main
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -72,6 +74,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupCalendar()
         handleFragmentStart()
 
+        if (!preferences.hasSeenOnBoardingNotification()) {
+            showOnboardingNotification()
+        }
+
         if (currentLatitude != 0.0 && currentLongitude != 0.0) {
             makeGeoOnboardingCall()
         } else {
@@ -101,6 +107,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onStop() {
         EventBus.getDefault().unregister(this)
         super.onStop()
+    }
+
+    private fun showOnboardingNotification() {
+        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    preferences.putOnboardingNotification(true)
+                }
+            }
+        }
+
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Hallo Schnäppchenjäger,\n\nwir möchten Dich bitten, jeden Markt den Du besuchen möchtest, noch einmal zur Sicherheit, am besten beim Betreiber selbst zu überprüfen, damit Du nicht unnötige Anfahrten auf Dich nehmen musst. Oft ändern sich Adressen oder Uhrzeiten ohne das wir davon in Kenntniss gesetzt werden.\n\nVielen Dank\nDein Flohmarkt-Termine Team").setPositiveButton("Verstanden", dialogClickListener).show()
     }
 
     private fun getSavedMarketsFromPreferences() {

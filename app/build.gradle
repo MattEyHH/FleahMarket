@@ -9,8 +9,8 @@ android {
         applicationId "de.feine_medien.flohmarkt"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 6
-        versionName "2.0"
+        versionCode 8
+        versionName "2.1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
