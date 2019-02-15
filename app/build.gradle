@@ -9,8 +9,8 @@ android {
         applicationId "de.feine_medien.flohmarkt"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 9
-        versionName "2.1.0"
+        versionCode 10
+        versionName "2.2.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -67,7 +67,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'joda-time:joda-time:2.10'
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
-        transitive = true;
+        transitive = true
     }
 
     testImplementation 'junit:junit:4.12'

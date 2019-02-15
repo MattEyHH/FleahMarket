@@ -23,6 +23,7 @@ import de.feine_medien.flohmarkt.main.MainActivity
 import de.feine_medien.flohmarkt.main.SplashActivity
 import de.feine_medien.flohmarkt.model.Market
 import de.feine_medien.flohmarkt.util.LocationProvider
+import de.feine_medien.flohmarkt.util.safeLet
 import kotlinx.android.synthetic.main.fragment_maps.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -81,7 +82,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         if (locationProvider.isPermissionGiven) {
             mMap.isMyLocationEnabled = true
             if (markets.isNotEmpty()) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(markets[0].event?.lat!!, markets[0].event?.lng!!), 11f))
+                var foundAnimateCameraPosition = false
+
+                markets.forEach {
+                    if (it.addr?.lat != 0.0 && it.addr?.lng != 0.0) {
+                        safeLet(it.addr?.lat, it.addr?.lng) { lat, lng ->
+                            if (!foundAnimateCameraPosition) {
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lng), 10f))
+                                foundAnimateCameraPosition = true
+                            }
+                        }
+                    }
+                }
             } else {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(MainActivity.currentLatitude, MainActivity.currentLongitude), 11f))
             }
@@ -99,18 +111,24 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         markets.let {
             if (markets.isNotEmpty()) {
                 markets.forEach { market ->
-                    val marker = MarkerOptions().position(LatLng(market.event?.lat!!, market.event.lng!!)).title(market.event.title).icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-                    mMap.addMarker(marker)
+                    safeLet(market.addr?.lat, market.addr?.lng) { lat, lng ->
+                        if (lat != 0.0 && lng != 0.0) {
+                            val marker = MarkerOptions().position(LatLng(lat, lng)).title(market.event?.title).icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+                            mMap.addMarker(marker)
+                        }
+                    }
                 }
             }
         }
 
-        mMap.setOnInfoWindowClickListener {
-            val latlng = it.position
+        mMap.setOnInfoWindowClickListener { mapMarker ->
+            val latlng = mapMarker.position
 
             markets.forEach {
-                if (latlng == LatLng(it.event?.lat!!, it.event.lng!!)) {
-                    startActivity(DetailActivity.getIntent(activity!!, it))
+                safeLet(it.addr?.lat, it.addr?.lng) { lat, lng ->
+                    if (latlng == LatLng(lat, lng)) {
+                        startActivity(DetailActivity.getIntent(activity!!, it))
+                    }
                 }
             }
         }

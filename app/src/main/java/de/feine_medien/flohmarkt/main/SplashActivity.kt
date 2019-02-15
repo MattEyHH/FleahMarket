@@ -8,14 +8,12 @@ import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import com.crashlytics.android.Crashlytics
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.event.OnNoGeoPermissionGivenEvent
 import de.feine_medien.flohmarkt.util.LocationProvider
-import org.greenrobot.eventbus.EventBus
-import com.crashlytics.android.Crashlytics
 import io.fabric.sdk.android.Fabric
-
-
+import org.greenrobot.eventbus.EventBus
 
 class SplashActivity : AppCompatActivity() {
 
@@ -39,7 +37,7 @@ class SplashActivity : AppCompatActivity() {
     }
     private fun startMainActivityWithDelay() {
         val handler = Handler()
-        handler.postDelayed(Runnable {
+        handler.postDelayed({
             val mainIntent = Intent(this, MainActivity::class.java)
             startActivity(mainIntent)
             finish()

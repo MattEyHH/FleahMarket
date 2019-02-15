@@ -12,16 +12,17 @@ import com.google.android.gms.ads.MobileAds
 import de.feine_medien.flohmarkt.R
 import de.feine_medien.flohmarkt.event.*
 import de.feine_medien.flohmarkt.model.Market
+import de.feine_medien.flohmarkt.util.PreferencesHandler
 import kotlinx.android.synthetic.main.fragment_search_list.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-
 
 class SearchListFragment : Fragment() {
 
     private var searchAdapter: SearchAdapter? = null
 
     private lateinit var bottomSheetDialogFragment: FilterBottomSheetDialogFragment
+    private lateinit var preferences: PreferencesHandler
 
     override fun onStart() {
         super.onStart()
@@ -44,6 +45,11 @@ class SearchListFragment : Fragment() {
 
         setupAdMobView()
         hideOtherLayouts()
+        setupPreferences()
+
+        if (preferences.getLastSearchedCity().isNotBlank()) {
+            tv_city.text = preferences.getLastSearchedCity()
+        }
 
         bottomSheetDialogFragment = FilterBottomSheetDialogFragment()
 
@@ -53,6 +59,10 @@ class SearchListFragment : Fragment() {
                 showProgress(true)
             }
         }
+    }
+
+    private fun setupPreferences() {
+        preferences = PreferencesHandler(context!!)
     }
 
     private fun hideOtherLayouts() {
